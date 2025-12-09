@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import axios from "axios";
 
 export async function POST() {
+  const channelId =
+    "19:Kbct8yWVoSkUfCRmWS3IoEn351HPK2u7S4hF3BQRx8c1@thread.tacv2";
+  const teamId = "164ebd2c-8444-4651-8e12-4094aea75da5";
+  const tenantId = "aae8fbe2-488b-49d9-b471-e4be61674a71";
+
   try {
     // 1️⃣ Get Azure token (app-only)
     const tokenResponse = await axios.post(
@@ -21,7 +26,7 @@ export async function POST() {
 
     // 2️⃣ Send Teams message (replace IDs with your own)
     const response = await axios.post(
-      `https://graph.microsoft.com/v1.0/teams/164ebd2c-8444-4651-8e12-4094aea75da5/channels/3AKbct8yWVoSkUfCRmWS3IoEn351HPK2u7S4hF3BQRx8c1/messages`,
+      `https://graph.microsoft.com/v1.0/teams/${teamId}/channels/${channelId}/messages`,
       {
         body: {
           content: "Hello World from Next.js App Router!",
