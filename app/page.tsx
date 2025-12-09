@@ -1,15 +1,28 @@
 "use client";
-import { useEffect } from "react";
-import * as microsoftTeams from "@microsoft/teams-js";
 
-const Dashboard = () => {
-  useEffect(() => {
-    microsoftTeams.app
-      .initialize()
-      .then(() => console.log("Teams SDK initialized"));
-  }, []);
+import { useState } from "react";
 
-  return <div>Hello Teams Tab!</div>;
-};
+export default function Home() {
+  const [status, setStatus] = useState("");
 
-export default Dashboard;
+  const sendNotification = async () => {
+    setStatus("Sending...");
+    try {
+      const res = await fetch("/api/send-notification", { method: "POST" });
+      const data = await res.json();
+      setStatus(JSON.stringify(data));
+    } catch (err) {
+      console.error(err);
+      setStatus("Error sending notification");
+    }
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <h1>Hello World Dashboard (App Router)</h1>
+      <p>This is public, no login required.</p>
+      <button onClick={sendNotification}>Send Notification</button>
+      <p>Status: {status}</p>
+    </div>
+  );
+}

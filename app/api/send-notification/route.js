@@ -1,0 +1,49 @@
+import { NextResponse } from "next/server";
+import axios from "axios";
+
+export async function POST() {
+  try {
+    // 1️⃣ Get Azure token (app-only)
+    const tokenResponse = await axios.post(
+      `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/oauth2/v2.0/token`,
+      new URLSearchParams({
+        client_id: process.env.AZURE_CLIENT_ID,
+        client_secret: process.env.AZURE_CLIENT_SECRET,
+        scope: "https://graph.microsoft.com/.default",
+        grant_type: "client_credentials",
+      }),
+      {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    // 2️⃣ Send Teams message (replace IDs with your own)
+    const response = await axios.post(
+      "https://graph.microsoft.com/v1.0/teams/{team-id}/channels/{channel-id}/messages",
+      {
+        body: {
+          content: "Hello World from Next.js App Router!",
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return NextResponse.json({
+      message: "Notification sent",
+      data: response.data,
+    });
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    return NextResponse.json(
+      { error: "Failed to send notification" },
+      { status: 500 }
+    );
+  }
+}
